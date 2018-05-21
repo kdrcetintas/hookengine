@@ -1,2 +1,2 @@
 # hookengine
-A simple hook engine for C# projects
+A simple hook engine for .NET projects
