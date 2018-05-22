@@ -12,18 +12,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Web;
 
-namespace kdrcts
+namespace kdrcts.kHelpers
 {
     public static class HookEngine
     {
 
+        /// <summary>
+        /// When HookEngine.Start() void is called, any void on your project with this attribute will called via reflection.
+        /// </summary>
         [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
         public class HookEngineAppStartupMethod : Attribute
-        {
-
-        }
+        {}
 
         public class HookOptions
         {
@@ -32,15 +32,33 @@ namespace kdrcts
 
         public class Hook
         {
+            /// <summary>
+            /// Hook registrations will called with ordering by Priority DESC
+            /// </summary>
             public int Priority { get; set; }
+            /// <summary>
+            /// Give a method address for callback
+            /// </summary>
             public Action<object[]> Target { get; set; }
         }
 
         private static HookOptions Options;
 
-        public static List<string> hookTypes = new List<string>();
-        public static List<KeyValuePair<string, Hook>> hooks = new List<KeyValuePair<string, Hook>>();
+        /// <summary>
+        /// Container for hookTypes
+        /// </summary>
+        private static List<string> hookTypes = new List<string>();
 
+        /// <summary>
+        /// Container for hooks
+        /// </summary>
+        private static List<KeyValuePair<string, Hook>> hooks = new List<KeyValuePair<string, Hook>>();
+
+        /// <summary>
+        /// Create hook types for seperating and call with specific hook registrations.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static bool addHookType(string name)
         {
             try
@@ -63,6 +81,12 @@ namespace kdrcts
             return false;
         }
 
+        /// <summary>
+        /// Create hook registrations for specific type list
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="_Hook"></param>
+        /// <returns></returns>
         public static bool addHook(string list, Hook _Hook)
         {
             try
@@ -84,6 +108,12 @@ namespace kdrcts
             return false;
         }
 
+        /// <summary>
+        /// Remove a hook registration from specific type list
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="_hook"></param>
+        /// <returns></returns>
         public static bool removeHook(string list, Hook _hook)
         {
             try
@@ -102,11 +132,31 @@ namespace kdrcts
             return false;
         }
 
+        /// <summary>
+        /// Get all hook registrations from specific type list
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static List<Hook> getHooks(string list)
         {
             return hooks.Where(r => r.Key == list).OrderByDescending(r => r.Value.Priority).Select(r => r.Value).ToList();
         }
 
+        /// <summary>
+        /// Get all hook types
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> getHookTypes()
+        {
+            return hookTypes.ToList();
+        }
+
+        /// <summary>
+        /// Call all hook registrations for specific registrations
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="_params"></param>
+        /// <param name="continueOnError"></param>
         public static void callHooks(string list, object[] _params, bool continueOnError = false)
         {
             try
@@ -131,6 +181,14 @@ namespace kdrcts
             }
         }
 
+        /// <summary>
+        /// Start the engine at your project startup.
+        /// It's could be OwinStartup class or Global.asax or WebApiConfig.cs for web projects
+        /// or
+        /// Could be Program.cs for Desktop projects
+        /// </summary>
+        /// <param name="_Options"></param>
+        /// <param name="_MainAssembly"></param>
         public static void Start(HookOptions _Options, Assembly _MainAssembly)
         {
             Options = _Options;
