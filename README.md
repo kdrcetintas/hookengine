@@ -1,3 +1,5 @@
+[![Chat](https://badges.gitter.im/hookengine/gitter.png)](https://gitter.im/hookengine/Lobby)
+
 # hookengine
 Information:
 
